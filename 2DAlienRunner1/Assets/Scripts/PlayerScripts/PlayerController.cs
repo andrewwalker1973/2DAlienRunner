@@ -6,59 +6,42 @@ public class PlayerController : MonoBehaviour
 {
 
     //Jump Settings
-    [SerializeField] private float jumpForce = 16f;
-    private float gravity = 12f;
-    private float verticalVelocity;
+    [SerializeField] private float jumpForce = 370f;
 
     // speed Modifier
     private float originalSpeed = 9.0f;
-    private float speed = 0.5f;
-    private float speedIncreaseLastTick;
-    private float speedIncreaseTime = 2.5f;
-    private float speedIncreaseAmount = 0.1f;
+    [SerializeField]  private float speed = 9f;
+
 
     //Environment Settings
     public bool isOnGround = true;
 
     // Bring in other references
     private Rigidbody playerRb;
-    private SphereCollider groundCollider;
+    private BoxCollider playerBoxCollider;
 
     // Movement settings
-    Vector3 moveRight;
+    //Vector3 moveRight;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
-       // speed = originalSpeed;
+        speed = originalSpeed;
 
-        // Get Components
+        // Get Components off Player 
         playerRb = GetComponent<Rigidbody>();
-        groundCollider = GetComponent<SphereCollider>();
+        playerBoxCollider = GetComponent<BoxCollider>();
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        //Code to increase speed over time
-      //  if (Time.time - speedIncreaseLastTick > speedIncreaseTime)
-     //   {
-     //       speedIncreaseLastTick = Time.time;
-     //       speed += speedIncreaseAmount;
 
-            // change modifer text display
-            //   GameManager.Instance.UpdateModifer(speed - originalSpeed);
-     //   }
-
-
-
-
+        #region Inputs for Player
         // Code to manage mobile and keyboard inputs
-        // gather the inputs on which lane we should be in
-
         if (MobileInput.Instance.SwipeLeft || Input.GetKeyDown(KeyCode.LeftArrow))
         {
             Debug.Log(" Go Left");
@@ -70,35 +53,59 @@ public class PlayerController : MonoBehaviour
 
         if (MobileInput.Instance.SwipeUp || Input.GetKeyDown(KeyCode.UpArrow) && isOnGround)
         {
-            //Jump
-            //anim.SetTrigger("Jump");
-            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isOnGround = false;
-            Debug.Log(" Jump");
+            StartJump();
         }
         else if (MobileInput.Instance.SwipeDown || Input.GetKeyDown(KeyCode.DownArrow))
         {
-
-            // StartSliding();
-            Debug.Log(" Slide");
+            StartSliding();
         }
 
+        #endregion
+        playerRb.velocity = new Vector3(speed, playerRb.velocity.y);
 
 
-        moveRight = gameObject.transform.position;    //When the game starts it will start to go to the right
-        moveRight.x -= speed;
-        gameObject.transform.position = moveRight;
-
-
+        
     }
 
     private void OnCollisionEnter(Collision collision)
     {
 
-        if (collision.gameObject.CompareTag("Ground"));
+        if (collision.gameObject.CompareTag("Ground"))
         {
             isOnGround = true;
         }
-
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            Debug.Log("Hit Obstacle");
+        }
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("Hit Enemy");
+        }
     }
+
+
+
+    #region Slide and Jump functions
+    private void StartSliding()
+    {
+        // anim.SetBool("Sliding", true);
+           playerBoxCollider.size -= new Vector3(0 , playerBoxCollider.size.y / 2, 0);
+          playerBoxCollider.center -= new Vector3(0, playerBoxCollider.size.y / 2, 0);
+          Invoke("StopSliding", 1.0f);
+    }
+    private void StopSliding()
+    {
+        //  anim.SetBool("Sliding", false);
+        playerBoxCollider.size = new Vector3(1, 2, 1);
+        playerBoxCollider.center = new Vector3(0, 0, 0);
+    }
+
+    private void StartJump()
+    {
+        //anim.SetTrigger("Jump");
+        playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        isOnGround = false;
+    }
+    #endregion
 }
