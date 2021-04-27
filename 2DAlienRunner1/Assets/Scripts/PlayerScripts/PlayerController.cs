@@ -6,22 +6,24 @@ public class PlayerController : MonoBehaviour
 {
 
     //Jump Settings
-    [SerializeField] private float jumpForce = 370f;
+    [SerializeField] private float jumpForce;
+    public bool isOnGround;
+ 
 
     // speed Modifier
     private float originalSpeed = 9.0f;
     [SerializeField]  private float speed = 9f;
 
-
-    //Environment Settings
-    public bool isOnGround = true;
-
     // Bring in other references
     private Rigidbody playerRb;
     private BoxCollider playerBoxCollider;
 
-    // Movement settings
-    //Vector3 moveRight;
+    //Slide Settings
+    private Vector3 slideColliderSizeRestore = new Vector3(1, 2, 1);
+    private Vector3 slideColliderCenterRestore = new Vector3(0, 0, 0);
+    public bool isSliding = false;
+
+
 
 
 
@@ -30,7 +32,7 @@ public class PlayerController : MonoBehaviour
     {
         speed = originalSpeed;
 
-        // Get Components off Player 
+        // Get Components off Player object
         playerRb = GetComponent<Rigidbody>();
         playerBoxCollider = GetComponent<BoxCollider>();
     }
@@ -38,7 +40,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
 
         #region Inputs for Player
         // Code to manage mobile and keyboard inputs
@@ -57,10 +58,13 @@ public class PlayerController : MonoBehaviour
         }
         else if (MobileInput.Instance.SwipeDown || Input.GetKeyDown(KeyCode.DownArrow))
         {
+            // AW maybe check to make sure we are on ground, cant slide in the air ?
             StartSliding();
         }
 
         #endregion
+
+        // Code to move the player to the right at spped value
         playerRb.velocity = new Vector3(speed, playerRb.velocity.y);
 
 
@@ -70,17 +74,26 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
 
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Ground"))  // if Hit Ground then we are grounded
         {
             isOnGround = true;
         }
-        if (collision.gameObject.CompareTag("Obstacle"))
+        if (collision.gameObject.CompareTag("Obstacle")) //If hit Obstacle process
         {
             Debug.Log("Hit Obstacle");
         }
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))  // If hit Enemy
         {
-            Debug.Log("Hit Enemy");
+            if (isSliding == true)                  // If the Player is sliding, they kick the feet out from under enemy and they die
+            {
+                Debug.Log("Killed Enemy");
+                Destroy(collision.gameObject);      // Code to destroy the object that we collided with
+            }
+            else
+            {
+                Debug.Log("Hit Enemy");
+                // AW DIE process
+            }
         }
     }
 
@@ -89,20 +102,26 @@ public class PlayerController : MonoBehaviour
     #region Slide and Jump functions
     private void StartSliding()
     {
+        // Code executed when the player slides
+        
         // anim.SetBool("Sliding", true);
-           playerBoxCollider.size -= new Vector3(0 , playerBoxCollider.size.y / 2, 0);
-          playerBoxCollider.center -= new Vector3(0, playerBoxCollider.size.y / 2, 0);
-          Invoke("StopSliding", 1.0f);
+        isSliding = true;
+        playerBoxCollider.size -= new Vector3(0 , playerBoxCollider.size.y / 2, 0);
+        playerBoxCollider.center -= new Vector3(0, playerBoxCollider.size.y / 2, 0);
+        Invoke("StopSliding", 1.0f);
     }
     private void StopSliding()
     {
+        // Code executed when the player stops sliding
         //  anim.SetBool("Sliding", false);
-        playerBoxCollider.size = new Vector3(1, 2, 1);
-        playerBoxCollider.center = new Vector3(0, 0, 0);
+        isSliding = false;
+        playerBoxCollider.size = slideColliderSizeRestore;
+        playerBoxCollider.center = slideColliderCenterRestore;
     }
 
     private void StartJump()
     {
+        // Code executed when the player jumps
         //anim.SetTrigger("Jump");
         playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         isOnGround = false;

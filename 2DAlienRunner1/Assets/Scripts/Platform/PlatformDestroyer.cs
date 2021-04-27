@@ -1,0 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlatformDestroyer : MonoBehaviour
+{
+    public GameObject platformDestructionPoint;
+    
+  
+    void Start()
+    {
+        platformDestructionPoint = GameObject.Find("PlatformDestructionPoint");
+    }
+
+   
+    void Update()
+    {
+        if (transform.position.x < platformDestructionPoint.transform.position.x)
+        {
+            //  Destroy(gameObject);
+            gameObject.SetActive(false);        // Disable the game object and have it availbe in the platform pool
+        }
+
+    }
+}
