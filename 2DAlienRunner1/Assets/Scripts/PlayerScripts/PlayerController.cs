@@ -10,9 +10,12 @@ public class PlayerController : MonoBehaviour
     public bool isOnGround;
  
 
+
     // speed Modifier
-    private float originalSpeed = 9.0f;
-    [SerializeField]  private float speed = 9f;
+    [SerializeField]  private float movespeed = 9f;
+    public float speedMultiplier;
+    public float speedIncreaseMilestone;
+    private float speedMilestoneCount;
 
     // Bring in other references
     private Rigidbody playerRb;
@@ -27,17 +30,19 @@ public class PlayerController : MonoBehaviour
 
 
 
-    // Start is called before the first frame update
+    
     void Start()
     {
-        speed = originalSpeed;
+       
 
         // Get Components off Player object
         playerRb = GetComponent<Rigidbody>();
         playerBoxCollider = GetComponent<BoxCollider>();
+
+        speedMilestoneCount = speedIncreaseMilestone;
     }
 
-    // Update is called once per frame
+   
     void Update()
     {
 
@@ -65,7 +70,14 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         // Code to move the player to the right at spped value
-        playerRb.velocity = new Vector3(speed, playerRb.velocity.y);
+        if (transform.position.x > speedMilestoneCount)
+        {
+            speedMilestoneCount += speedIncreaseMilestone;
+            speedIncreaseMilestone = speedIncreaseMilestone * speedMultiplier;
+            movespeed = movespeed * speedMultiplier;
+        }
+
+        playerRb.velocity = new Vector3(movespeed, playerRb.velocity.y);
 
 
         

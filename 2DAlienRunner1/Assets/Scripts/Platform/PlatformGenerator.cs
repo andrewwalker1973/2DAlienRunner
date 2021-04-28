@@ -12,6 +12,11 @@ public class PlatformGenerator : MonoBehaviour
     //Variables for Randomize the distance between platfroms
     public float distanceBetweenMin;        // Min distance between the platforms
     public float distanceBetweenMax;        // Max distance between the platforms
+    private float minHeight;
+    public Transform maxHeightPoint;
+    private float maxHeight;
+    public float maxHeightChange;
+    private float heightChange;
 
    // public GameObject[] thePlatforms;
     private int platformSelector;
@@ -30,6 +35,9 @@ public class PlatformGenerator : MonoBehaviour
         {
             platformWidths[i] = theObjectPools[i].pooledObject.transform.localScale.x;
         }
+
+        minHeight = transform.position.y;
+        maxHeight = maxHeightPoint.position.y;
     }
 
    
@@ -41,7 +49,17 @@ public class PlatformGenerator : MonoBehaviour
 
             platformSelector = Random.Range(0, theObjectPools.Length);
 
-            transform.position = new Vector3(transform.position.x + (platformWidths[platformSelector] / 2) + distanceBetween, transform.position.y, transform.position.z);  // Determine the position to spawn new platform
+            heightChange = transform.position.y + Random.Range(maxHeightChange, -maxHeightChange);
+            if (heightChange > maxHeight )
+            {
+                heightChange = maxHeight;
+            }
+            else if(heightChange < minHeight)
+            {
+                heightChange = minHeight;
+            }
+
+            transform.position = new Vector3(transform.position.x + (platformWidths[platformSelector] / 2) + distanceBetween, heightChange, transform.position.z);  // Determine the position to spawn new platform
 
             
             
