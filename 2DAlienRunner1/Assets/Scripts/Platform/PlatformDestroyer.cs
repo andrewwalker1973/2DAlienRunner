@@ -9,15 +9,15 @@ public class PlatformDestroyer : MonoBehaviour
   
     void Start()
     {
-        platformDestructionPoint = GameObject.Find("PlatformDestructionPoint");
+        platformDestructionPoint = GameObject.Find("PlatformDestructionPoint");         // find the platform desruction point attached to the camera
     }
 
    
     void Update()
     {
-        if (transform.position.x < platformDestructionPoint.transform.position.x)
+        if (transform.position.x < platformDestructionPoint.transform.position.x)   // if gameobject past the point disable it
         {
-            //  Destroy(gameObject);
+            
             gameObject.SetActive(false);        // Disable the game object and have it availbe in the platform pool
         }
 

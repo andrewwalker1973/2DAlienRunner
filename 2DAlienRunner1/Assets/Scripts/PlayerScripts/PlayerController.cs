@@ -6,27 +6,32 @@ public class PlayerController : MonoBehaviour
 {
 
     //Jump Settings
-    [SerializeField] private float jumpForce;
-    public bool isOnGround;
+    [SerializeField] private float jumpForce;               // How much force to apply to jump
+    public bool isOnGround;                                 // bool to check if grounded
  
 
 
     // speed Modifier
-    [SerializeField]  private float movespeed = 9f;
-    public float speedMultiplier;
-    public float speedIncreaseMilestone;
-    private float speedMilestoneCount;
+    [SerializeField]  private float movespeed = 9f;         // Start MoveSpeed
+    private float moveSpeedStore;                           // store of start speed to be used when restarting
+    private float speedMilestoneCountStore;                 // store of start milestone to be used when restarting
+    public float speedMultiplier;                           // how much to multiple spped by yo increase
+    private float speedMilestoneCount;                      // Milestone value for first speed increase
+    public float speedIncreaseMilestone;                    // How much to increase the distance between milestones
+    private float speedIncreaseMilestoneStore;              // store of initial milestore to be used when restarting
+
+
 
     // Bring in other references
     private Rigidbody playerRb;
     private BoxCollider playerBoxCollider;
 
     //Slide Settings
-    private Vector3 slideColliderSizeRestore = new Vector3(1, 2, 1);
-    private Vector3 slideColliderCenterRestore = new Vector3(0, 0, 0);
-    public bool isSliding = false;
+    private Vector3 slideColliderSizeRestore = new Vector3(1, 2, 1);            // Collider settings for when sliding
+    private Vector3 slideColliderCenterRestore = new Vector3(0, 0, 0);          // Collider settings for when sliding
+    public bool isSliding = false;                                 // Sliding true/false
 
-
+    public GameManager theGameManager;                              // Reference the GameManager script to call fucntions
 
 
 
@@ -39,7 +44,12 @@ public class PlayerController : MonoBehaviour
         playerRb = GetComponent<Rigidbody>();
         playerBoxCollider = GetComponent<BoxCollider>();
 
-        speedMilestoneCount = speedIncreaseMilestone;
+        // Save settings to reset when restarting game
+        speedMilestoneCount = speedIncreaseMilestone;                   
+        moveSpeedStore = movespeed;
+        speedMilestoneCountStore = speedMilestoneCount;
+        speedIncreaseMilestoneStore = speedIncreaseMilestone;
+        
     }
 
    
@@ -70,14 +80,14 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         // Code to move the player to the right at spped value
-        if (transform.position.x > speedMilestoneCount)
+        if (transform.position.x > speedMilestoneCount)                     // if > milestone increase speed
         {
             speedMilestoneCount += speedIncreaseMilestone;
             speedIncreaseMilestone = speedIncreaseMilestone * speedMultiplier;
             movespeed = movespeed * speedMultiplier;
         }
 
-        playerRb.velocity = new Vector3(movespeed, playerRb.velocity.y);
+        playerRb.velocity = new Vector3(movespeed, playerRb.velocity.y);        // Constanlty move to the right
 
 
         
@@ -93,18 +103,22 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Obstacle")) //If hit Obstacle process
         {
             Debug.Log("Hit Obstacle");
+            theGameManager.RestartGame();       // AW want pause and choose to continue later
         }
         if (collision.gameObject.CompareTag("Enemy"))  // If hit Enemy
         {
-            if (isSliding == true)                  // If the Player is sliding, they kick the feet out from under enemy and they die
+            if (isSliding == true)                      // If the Player is sliding, they kick the feet out from under enemy and they die
             {
                 Debug.Log("Killed Enemy");
-                Destroy(collision.gameObject);      // Code to destroy the object that we collided with
+                Destroy(collision.gameObject);          // Code to destroy the object that we collided with
             }
             else
             {
                 Debug.Log("Hit Enemy");
-                // AW DIE process
+                theGameManager.RestartGame();  // AW want pause and choose to continue later
+                movespeed = moveSpeedStore;     //Reset back to starting game speed
+                speedMilestoneCount = speedMilestoneCountStore;  //Reset back to starting game speed increase
+                speedIncreaseMilestone = speedIncreaseMilestoneStore; //Reset back to starting game spped milestone
             }
         }
     }
@@ -118,8 +132,8 @@ public class PlayerController : MonoBehaviour
         
         // anim.SetBool("Sliding", true);
         isSliding = true;
-        playerBoxCollider.size -= new Vector3(0 , playerBoxCollider.size.y / 2, 0);
-        playerBoxCollider.center -= new Vector3(0, playerBoxCollider.size.y / 2, 0);
+        playerBoxCollider.size -= new Vector3(0 , playerBoxCollider.size.y / 2, 0);     // shrink collider 
+        playerBoxCollider.center -= new Vector3(0, playerBoxCollider.size.y / 2, 0);    // shrink collider 
         Invoke("StopSliding", 1.0f);
     }
     private void StopSliding()
@@ -127,16 +141,18 @@ public class PlayerController : MonoBehaviour
         // Code executed when the player stops sliding
         //  anim.SetBool("Sliding", false);
         isSliding = false;
-        playerBoxCollider.size = slideColliderSizeRestore;
-        playerBoxCollider.center = slideColliderCenterRestore;
+        playerBoxCollider.size = slideColliderSizeRestore;                  // Restore collider
+        playerBoxCollider.center = slideColliderCenterRestore;              // Restore collider
     }
 
     private void StartJump()
     {
         // Code executed when the player jumps
         //anim.SetTrigger("Jump");
-        playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);       // Actual jump using physics to jump
         isOnGround = false;
     }
     #endregion
+
+
 }

@@ -12,16 +12,16 @@ public class PlatformGenerator : MonoBehaviour
     //Variables for Randomize the distance between platfroms
     public float distanceBetweenMin;        // Min distance between the platforms
     public float distanceBetweenMax;        // Max distance between the platforms
-    private float minHeight;
-    public Transform maxHeightPoint;
-    private float maxHeight;
-    public float maxHeightChange;
+    private float minHeight;                // Min height from bottom of screen
+    public Transform maxHeightPoint;        // Max height of gameobject on screen
+    private float maxHeight;                
+    public float maxHeightChange;           // how much can we increase in height
     private float heightChange;
 
    // public GameObject[] thePlatforms;
-    private int platformSelector;
+    private int platformSelector;           // int to number the platforms
 
-    public float[] platformWidths;
+    public float[] platformWidths;          // array to manage the widths of the platforms 
 
     public ObjectPooler[] theObjectPools;      // Refernce the object pooler script
   
@@ -29,15 +29,15 @@ public class PlatformGenerator : MonoBehaviour
     {
 
 
-        // platformWidth = thePlatform.transform.localScale.x;     // Get the platform with on the x value
-        platformWidths = new float[theObjectPools.Length];
+        
+        platformWidths = new float[theObjectPools.Length];      // create array with all the platfomr widths for the platforms chosen
         for (int i = 0; i < theObjectPools.Length; i++)
         {
             platformWidths[i] = theObjectPools[i].pooledObject.transform.localScale.x;
         }
 
-        minHeight = transform.position.y;
-        maxHeight = maxHeightPoint.position.y;
+        minHeight = transform.position.y;               // set min height to be the height of the current platfomr in y
+        maxHeight = maxHeightPoint.position.y;          
     }
 
    
@@ -47,9 +47,11 @@ public class PlatformGenerator : MonoBehaviour
         {
             distanceBetween = Random.Range(distanceBetweenMin, distanceBetweenMax);     // randomize the distance between platforms
 
-            platformSelector = Random.Range(0, theObjectPools.Length);
+            platformSelector = Random.Range(0, theObjectPools.Length);              // Randomize which platfomr to select
 
-            heightChange = transform.position.y + Random.Range(maxHeightChange, -maxHeightChange);
+            heightChange = transform.position.y + Random.Range(maxHeightChange, -maxHeightChange);      // randomize the height to be chnaged
+           
+            // Code to ensure we dont go to high or too low off screen
             if (heightChange > maxHeight )
             {
                 heightChange = maxHeight;
