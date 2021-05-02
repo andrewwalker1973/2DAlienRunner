@@ -24,6 +24,9 @@ public class PlatformGenerator : MonoBehaviour
     public float[] platformWidths;          // array to manage the widths of the platforms 
 
     public ObjectPooler[] theObjectPools;      // Refernce the object pooler script
+
+    private CoinGenerator theCoinGenerator;      // reference the coin genertion script
+    public float randomCoinThreshold;           // Randomize if coin appears
   
     void Start()
     {
@@ -37,7 +40,9 @@ public class PlatformGenerator : MonoBehaviour
         }
 
         minHeight = transform.position.y;               // set min height to be the height of the current platfomr in y
-        maxHeight = maxHeightPoint.position.y;          
+        maxHeight = maxHeightPoint.position.y;
+
+        theCoinGenerator = FindObjectOfType<CoinGenerator>();
     }
 
    
@@ -70,6 +75,12 @@ public class PlatformGenerator : MonoBehaviour
             newPlatform.transform.position = transform.position;                            // set the new platforms position
             newPlatform.transform.rotation = transform.rotation;                            // Set the new platforms rotation
             newPlatform.SetActive(true);                                                    // Set it active in the game
+
+            if (Random.Range(0f, 100f) < randomCoinThreshold)        // if random value below threshold spawn a coin set
+            {
+                theCoinGenerator.SpawnCoins(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z));
+            }
+           
 
             transform.position = new Vector3(transform.position.x + (platformWidths[platformSelector] / 2), transform.position.y, transform.position.z);  // Determine the position to spawn new platform
 
