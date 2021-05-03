@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
     // Bring in other references
     private Rigidbody playerRb;
     private BoxCollider playerBoxCollider;
+    
+
 
     //Slide Settings
     private Vector3 slideColliderSizeRestore = new Vector3(1, 2, 1);            // Collider settings for when sliding
@@ -33,7 +35,8 @@ public class PlayerController : MonoBehaviour
 
     public GameManager theGameManager;                              // Reference the GameManager script to call fucntions
 
-
+  //  public AudioSource deathSound;
+  //  public AudioSource jumpSound;
 
     
     void Start()
@@ -43,6 +46,9 @@ public class PlayerController : MonoBehaviour
         // Get Components off Player object
         playerRb = GetComponent<Rigidbody>();
         playerBoxCollider = GetComponent<BoxCollider>();
+        
+
+
 
         // Save settings to reset when restarting game
         speedMilestoneCount = speedIncreaseMilestone;                   
@@ -103,56 +109,74 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Obstacle")) //If hit Obstacle process
         {
             Debug.Log("Hit Obstacle");
+          //  deathSound.Play();
             theGameManager.RestartGame();       // AW want pause and choose to continue later
         }
-        if (collision.gameObject.CompareTag("Enemy"))  // If hit Enemy
-        {
-            if (isSliding == true)                      // If the Player is sliding, they kick the feet out from under enemy and they die
-            {
-                Debug.Log("Killed Enemy");
-                Destroy(collision.gameObject);          // Code to destroy the object that we collided with
-            }
-            else
-            {
-                Debug.Log("Hit Enemy");
-                theGameManager.RestartGame();  // AW want pause and choose to continue later
-                movespeed = moveSpeedStore;     //Reset back to starting game speed
-                speedMilestoneCount = speedMilestoneCountStore;  //Reset back to starting game speed increase
-                speedIncreaseMilestone = speedIncreaseMilestoneStore; //Reset back to starting game spped milestone
-            }
-        }
+        // AW add below in here somewher
+        /*
+         * Coin coin = other.GetComponent<Coin>();
+          //  Debug.Log("Coin Collide");
+          coin.Collect();
+
+        */
+
+          if (collision.gameObject.CompareTag("Enemy"))  // If hit Enemy
+          {
+              if (isSliding == true)                      // If the Player is sliding, they kick the feet out from under enemy and they die
+              {
+                  Debug.Log("Killed Enemy");
+                  Destroy(collision.gameObject);          // Code to destroy the object that we collided with
+              }
+              else
+              {
+                  Debug.Log("Hit Enemy");
+                //  deathSound.Play();
+                  theGameManager.RestartGame();  // AW want pause and choose to continue later
+                  movespeed = moveSpeedStore;     //Reset back to starting game speed
+                  speedMilestoneCount = speedMilestoneCountStore;  //Reset back to starting game speed increase
+                  speedIncreaseMilestone = speedIncreaseMilestoneStore; //Reset back to starting game spped milestone
+              }
+          }
+      }
+
+
+
+      #region Slide and Jump functions
+      private void StartSliding()
+      {
+          // Code executed when the player slides
+
+          // anim.SetBool("Sliding", true);
+          isSliding = true;
+          playerBoxCollider.size -= new Vector3(0 , playerBoxCollider.size.y / 2, 0);     // shrink collider 
+          playerBoxCollider.center -= new Vector3(0, playerBoxCollider.size.y / 2, 0);    // shrink collider 
+          Invoke("StopSliding", 1.0f);
+      }
+      private void StopSliding()
+      {
+          // Code executed when the player stops sliding
+          //  anim.SetBool("Sliding", false);
+          isSliding = false;
+          playerBoxCollider.size = slideColliderSizeRestore;                  // Restore collider
+          playerBoxCollider.center = slideColliderCenterRestore;              // Restore collider
+      }
+
+      private void StartJump()
+      {
+          // Code executed when the player jumps
+          //anim.SetTrigger("Jump");
+          playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);       // Actual jump using physics to jump
+          isOnGround = false;
+         // jumpSound.Play();
+      }
+      #endregion
+
+    /*  private void CoinCollision(Collider other)
+      {
+          Coin coin = other.GetComponent<Coin>();
+          //  Debug.Log("Coin Collide");
+          coin.Collect();
+
+      }
+    */
     }
-
-
-
-    #region Slide and Jump functions
-    private void StartSliding()
-    {
-        // Code executed when the player slides
-        
-        // anim.SetBool("Sliding", true);
-        isSliding = true;
-        playerBoxCollider.size -= new Vector3(0 , playerBoxCollider.size.y / 2, 0);     // shrink collider 
-        playerBoxCollider.center -= new Vector3(0, playerBoxCollider.size.y / 2, 0);    // shrink collider 
-        Invoke("StopSliding", 1.0f);
-    }
-    private void StopSliding()
-    {
-        // Code executed when the player stops sliding
-        //  anim.SetBool("Sliding", false);
-        isSliding = false;
-        playerBoxCollider.size = slideColliderSizeRestore;                  // Restore collider
-        playerBoxCollider.center = slideColliderCenterRestore;              // Restore collider
-    }
-
-    private void StartJump()
-    {
-        // Code executed when the player jumps
-        //anim.SetTrigger("Jump");
-        playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);       // Actual jump using physics to jump
-        isOnGround = false;
-    }
-    #endregion
-
-
-}

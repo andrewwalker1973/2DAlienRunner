@@ -14,6 +14,9 @@ public class GameManager : MonoBehaviour
     private PlatformDestroyer[] platformList;       // Create an array of platforms to disable when restarting the game
 
     private ScoreManager theScoreManager;           // reference the scoremanager script
+
+    public DeathMenu theDeathScreen;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,22 +26,29 @@ public class GameManager : MonoBehaviour
         theScoreManager = FindObjectOfType<ScoreManager>();         // find the score Manager script
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 
     public void RestartGame()           // function to be called from other scripts to restart the game
     {
-        StartCoroutine("RestartGameCo");
-    }
-
-    public IEnumerator RestartGameCo()
-    {
+        // StartCoroutine("RestartGameCo");
         theScoreManager.scoreIncreasing = false;         // stop increasing score
         thePlayer.gameObject.SetActive(false);              // disable the player
+        theDeathScreen.gameObject.SetActive(true);          // bring up the death Menu screen
+    }
+
+   /* public IEnumerator RestartGameCo()
+    {
+        
         yield return new WaitForSeconds(1f);                    // wait 1 sec
+        
+
+
+    }
+   */
+
+    public void ResetToBegining()               // AW Dont want to reset. want to continue
+    {
+        theDeathScreen.gameObject.SetActive(false);          // stop up the death Menu screen
         platformList = FindObjectsOfType<PlatformDestroyer>();      // generate a list of all active platfomrs and disable
         for (int i = 0; i < platformList.Length; i++)
         {
@@ -50,7 +60,5 @@ public class GameManager : MonoBehaviour
         thePlayer.gameObject.SetActive(true);                       // re-enable the player
         theScoreManager.scoreCount = 0;                             // reset score back to 0
         theScoreManager.scoreIncreasing = true;                     // let score being increasing again
-
-
     }
 }
