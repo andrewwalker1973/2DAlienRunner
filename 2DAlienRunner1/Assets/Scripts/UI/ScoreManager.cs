@@ -16,6 +16,7 @@ public class ScoreManager : MonoBehaviour
     public float pointsPerSecond;               // how much to increase score by
     public bool scoreIncreasing;                // is score increasing ? dont want to increase while dead
 
+    public bool shouldDouble;                   // if powerup double active;
 
     // Start is called before the first frame update
     void Start()
@@ -52,6 +53,10 @@ public class ScoreManager : MonoBehaviour
 
     public void AddScore(int pointsToAdd)
     {
+        if (shouldDouble)
+        {
+            pointsToAdd = pointsToAdd * 2;
+        }
         scoreCount += pointsToAdd;
-    }
+     }   
 }

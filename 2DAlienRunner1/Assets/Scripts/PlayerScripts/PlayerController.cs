@@ -112,14 +112,7 @@ public class PlayerController : MonoBehaviour
           //  deathSound.Play();
             theGameManager.RestartGame();       // AW want pause and choose to continue later
         }
-        // AW add below in here somewher
-        /*
-         * Coin coin = other.GetComponent<Coin>();
-          //  Debug.Log("Coin Collide");
-          coin.Collect();
-
-        */
-
+        
           if (collision.gameObject.CompareTag("Enemy"))  // If hit Enemy
           {
               if (isSliding == true)                      // If the Player is sliding, they kick the feet out from under enemy and they die
@@ -169,14 +162,37 @@ public class PlayerController : MonoBehaviour
           isOnGround = false;
          // jumpSound.Play();
       }
-      #endregion
+    #endregion
 
-    /*  private void CoinCollision(Collider other)
+
+    // code for powerup triggger
+    void OnTriggerEnter(Collider other)
+    {
+        print(other + " name " + other.name);
+        switch (other.tag)
+        {
+            case "Coin":
+               
+                CoinCollision(other);
+                break;
+           // case "Magnet":
+          //      MagnetCollision(other);
+                //       Debug.Log("Magnet collide");
+           //     break;
+
+           // default:
+            //    CheckUnTaggedCollision(other);
+              //  break;
+        }
+    }
+
+
+     private void CoinCollision(Collider other)
       {
-          Coin coin = other.GetComponent<Coin>();
-          //  Debug.Log("Coin Collide");
-          coin.Collect();
+        CoinCollect coin = other.GetComponent<CoinCollect>();
+        //  Debug.Log("Coin Collide");
+        coin.Collect();
 
       }
-    */
-    }
+    
+}

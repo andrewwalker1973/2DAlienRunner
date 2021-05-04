@@ -26,7 +26,7 @@ public class CoinCollect : MonoBehaviour
 
     public void Collect()
     {
-        
+        Debug.Log("Coin collected");
         audioManager.PlaySound(coinSoundName);
         
 
