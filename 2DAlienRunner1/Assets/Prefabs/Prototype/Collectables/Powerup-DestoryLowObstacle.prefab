@@ -125,3 +125,5 @@ MonoBehaviour:
   doublePoints: 0
   safeMode: 1
   powerupLength: 10
+  powerUpSprites:
+  - {fileID: 0}

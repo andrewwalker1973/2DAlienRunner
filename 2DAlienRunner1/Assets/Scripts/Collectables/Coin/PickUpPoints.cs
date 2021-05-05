@@ -6,15 +6,15 @@ public class PickUpPoints : MonoBehaviour
 {
     public int scoreToGive;     // what point value to give
 
-    private ScoreManager theScoreManager;
+    private ScoreManager theScoreManager;       // reference the score manager
 
-   // private AudioSource coinSound;
+
     
   
     void Start()
     {
-        theScoreManager = FindObjectOfType<ScoreManager>();
-   //     coinSound = GameObject.Find("CoinSound").GetComponent<AudioSource>();
+        theScoreManager = FindObjectOfType<ScoreManager>();         // find score manager script
+
     }
 
     
@@ -29,18 +29,9 @@ public class PickUpPoints : MonoBehaviour
         if(other.gameObject.CompareTag("Player"))       // if hit the player
         {
             theScoreManager.AddScore(scoreToGive);          // send point value to scoreManger
-            gameObject.SetActive(false);
+            gameObject.SetActive(false);                    // set game object disable
 
-      /*      if (coinSound.isPlaying)
-            {
-                coinSound.Stop();
-                coinSound.Play();
-            }
-            else
-            {
-                coinSound.Play();
-            }
-      */
+     
         }
     }
 }

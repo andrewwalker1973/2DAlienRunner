@@ -23,15 +23,15 @@ public class PlayerController : MonoBehaviour
 
 
     // Bring in other references
-    private Rigidbody playerRb;
-    private BoxCollider playerBoxCollider;
+    private Rigidbody playerRb;                             // Player rigibody
+    private BoxCollider playerBoxCollider;                  // Player Box collider
     
 
 
     //Slide Settings
     private Vector3 slideColliderSizeRestore = new Vector3(1, 2, 1);            // Collider settings for when sliding
     private Vector3 slideColliderCenterRestore = new Vector3(0, 0, 0);          // Collider settings for when sliding
-    public bool isSliding = false;                                 // Sliding true/false
+    public bool isSliding = false;                                              // am Sliding true/false
 
     public GameManager theGameManager;                              // Reference the GameManager script to call fucntions
 
@@ -190,7 +190,6 @@ public class PlayerController : MonoBehaviour
      private void CoinCollision(Collider other)
       {
         CoinCollect coin = other.GetComponent<CoinCollect>();
-        //  Debug.Log("Coin Collide");
         coin.Collect();
 
       }

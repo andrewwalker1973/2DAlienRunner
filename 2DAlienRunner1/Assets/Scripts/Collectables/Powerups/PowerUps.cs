@@ -12,25 +12,24 @@ public class PowerUps : MonoBehaviour
 
     private PowerUpManager thepowerUpManager;       // referenc ethe powerup manager
 
+    
+
 
     void Start()
     {
-        thepowerUpManager = FindObjectOfType<PowerUpManager>();
+        thepowerUpManager = FindObjectOfType<PowerUpManager>();         // find the Powerup Manager script
     }
 
    
-    void Update()
-    {
-        
-    }
+    
 
      void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))      // if player hits object
+        if (other.gameObject.CompareTag("Player"))                                          // if player hits object
         {
             thepowerUpManager.ActivatePowerUp(doublePoints, safeMode, powerupLength);       // send all details to powerup manger
         }
 
-        gameObject.SetActive(false);        // disbale the powerup onject
+        gameObject.SetActive(false);                                                        // disbale the powerup onject
     }
 }

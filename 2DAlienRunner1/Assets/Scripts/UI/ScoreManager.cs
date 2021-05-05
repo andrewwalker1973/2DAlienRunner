@@ -18,18 +18,17 @@ public class ScoreManager : MonoBehaviour
 
     public bool shouldDouble;                   // if powerup double active;
 
-    // Start is called before the first frame update
+    
     void Start()
     {
         if (PlayerPrefs.HasKey("Highscore"))                // if highscore exists in playprefs
         {
-            Debug.Log("Get highscore");
             hiScoreCount = PlayerPrefs.GetFloat("HighScore");       // pull from player prefs
-            Debug.Log("Hiscore" + hiScoreCount);
+            
         }
     }
 
-    // Update is called once per frame
+
     void Update()
     {
        
@@ -39,11 +38,11 @@ public class ScoreManager : MonoBehaviour
         }
         
 
-        if (scoreCount > hiScoreCount)
+        if (scoreCount > hiScoreCount)                      // if score > hghscore update highscore
         {
-            hiScoreCount = scoreCount;
+            hiScoreCount = scoreCount;                      // update highscore
              PlayerPrefs.SetFloat("HighScore", hiScoreCount);            // AW save highscore to playerPrefs may not be the best place for it as this happens while player is running
-            // Debug.Log("Hiscore set " + hiScoreCount);
+            
         }
 
         scoreText.text = "Score : " + Mathf.Round (scoreCount);           // set the scorecout on screen rount to solid number
@@ -53,10 +52,10 @@ public class ScoreManager : MonoBehaviour
 
     public void AddScore(int pointsToAdd)
     {
-        if (shouldDouble)
+        if (shouldDouble)               // if we are doubling points
         {
-            pointsToAdd = pointsToAdd * 2;
+            pointsToAdd = pointsToAdd * 2;  // double the points
         }
-        scoreCount += pointsToAdd;
+        scoreCount += pointsToAdd;      // otherwise normal add
      }   
 }

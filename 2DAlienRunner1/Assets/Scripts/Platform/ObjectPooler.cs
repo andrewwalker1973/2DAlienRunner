@@ -24,10 +24,6 @@ public class ObjectPooler : MonoBehaviour
     }
 
 
-    void Update()
-    {
-        
-    }
 
 
     public GameObject GetPooledObject()         

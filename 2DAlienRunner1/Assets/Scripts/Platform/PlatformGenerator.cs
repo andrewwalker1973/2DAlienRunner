@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlatformGenerator : MonoBehaviour
 {
-    public GameObject thePlatform;      // The platform game object array
+   // public GameObject thePlatform;      // The platform game object 
     public Transform generationPoint;   // where to generate the platform
     private float distanceBetween;      // distance between the platforms
     private float platformWidth;        // the Width of the platform
@@ -18,7 +18,7 @@ public class PlatformGenerator : MonoBehaviour
     public float maxHeightChange;           // how much can we increase in height
     private float heightChange;
 
-   // public GameObject[] thePlatforms;
+  // public GameObject[] thePlatforms;
     private int platformSelector;           // int to number the platforms
 
     public float[] platformWidths;          // array to manage the widths of the platforms 
@@ -33,6 +33,11 @@ public class PlatformGenerator : MonoBehaviour
 
     public float randomHighObstacleThreshold;        // Random Range for high obstacle pool
     public ObjectPooler HighObstaclePool;            // Define the high Obstacle Pool
+        
+    public float powerUpHeight;                     // How high to pisiton powerp
+    public ObjectPooler powerUpPool;                // the pool to reference for powerups
+    public float powerUpThreshold;                  // what is the threshold for appearing
+
 
     void Start()
     {
@@ -48,7 +53,7 @@ public class PlatformGenerator : MonoBehaviour
         minHeight = transform.position.y;               // set min height to be the height of the current platfomr in y
         maxHeight = maxHeightPoint.position.y;
 
-        theCoinGenerator = FindObjectOfType<CoinGenerator>();
+        theCoinGenerator = FindObjectOfType<CoinGenerator>();           // find coin genertor script
     }
 
    
@@ -72,11 +77,21 @@ public class PlatformGenerator : MonoBehaviour
                 heightChange = minHeight;
             }
 
+            // Random generate a poweruP
+            if (Random.Range (0f,100f) < powerUpThreshold)
+            {
+                GameObject newPowerup = powerUpPool.GetPooledObject();                      // find powerup in pool
+                newPowerup.transform.position = transform.position + new Vector3(distanceBetween / 2f, Random.Range(powerUpHeight /2,powerUpHeight), 0f);       // add between platforms min 1/2 distance max distance
+                newPowerup.SetActive(true);                                                 // set powerup active
+
+            }
+
+
             transform.position = new Vector3(transform.position.x + (platformWidths[platformSelector] / 2) + distanceBetween, heightChange, transform.position.z);  // Determine the position to spawn new platform
 
             
             
-                   // Create the actual platform piece in the game world
+            // Create the actual platform piece in the game world
             GameObject newPlatform = theObjectPools[platformSelector].GetPooledObject();                        // run the function in the ObjectPool script called GetpooledObject to find the next game object and make it a game object
             newPlatform.transform.position = transform.position;                            // set the new platforms position
             newPlatform.transform.rotation = transform.rotation;                            // Set the new platforms rotation
@@ -84,7 +99,7 @@ public class PlatformGenerator : MonoBehaviour
 
             if (Random.Range(0f, 100f) < randomCoinThreshold)        // if random value below threshold spawn a coin set
             {
-                theCoinGenerator.SpawnCoins(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z));
+                theCoinGenerator.SpawnCoins(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z));        // spawn coin in center of platform
             }
 
             if (Random.Range(0f, 100f) < randomLowObstacleThreshold)        // if random value below threshold spawn a low Obstacke

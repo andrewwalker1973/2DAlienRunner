@@ -8,7 +8,7 @@ public class PowerUpManager : MonoBehaviour
     private bool doublePoints;          // which powerup is being activated
     private bool safeMode;              // which powerup is being activated
 
-    private bool  powerupActive;        // which powerup is active
+    private bool powerupActive;        // which powerup is active
     private float powerUpLenghtCounter; // How long is it active for
 
     private float normalPointsPerSecond;        // to store normal points per second
@@ -16,20 +16,30 @@ public class PowerUpManager : MonoBehaviour
 
     private ScoreManager theScoreManager;       // need the score manager script
     private PlatformGenerator thePlatformGenerator;     // need the platformmanager script
+    private GameManager theGameManager;                 // refernce the game manager script
 
-    // Start is called before the first frame update
+    private PlatformDestroyer[] lowObstacleList;          // List of all the low obstacle in the game
+
+
     void Start()
     {
         theScoreManager = FindObjectOfType<ScoreManager>();
         thePlatformGenerator = FindObjectOfType<PlatformGenerator>();
+        theGameManager = FindObjectOfType<GameManager>();
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         if (powerupActive)
         {
             powerUpLenghtCounter -= Time.deltaTime;     // Start decreasing the time
+
+            if (theGameManager.powerUpReset)             // if reset counter is true, disable all powerups
+            {
+                powerUpLenghtCounter = 0;           // disable all powerups on rest
+                theGameManager.powerUpReset = false;    // flag to disable powerups in game manager
+            }
 
             if (doublePoints)
             {
@@ -43,12 +53,12 @@ public class PowerUpManager : MonoBehaviour
             }
 
 
-            if (powerUpLenghtCounter <= 0)      // when at 0
+            if (powerUpLenghtCounter <= 0)                                              // when at 0
             {
-                theScoreManager.pointsPerSecond = normalPointsPerSecond;        // set points per second back
+                theScoreManager.pointsPerSecond = normalPointsPerSecond;             // set points per second back
                 thePlatformGenerator.randomLowObstacleThreshold = LowObstacleRate;  // set low obstacle rate back
-                theScoreManager.shouldDouble = false;
-                powerupActive = false;      // disable the powerup
+                theScoreManager.shouldDouble = false;                               // stop doubling points
+                powerupActive = false;                                              // disable the powerup
             }
         }
     }
@@ -62,7 +72,18 @@ public class PowerUpManager : MonoBehaviour
         normalPointsPerSecond = theScoreManager.pointsPerSecond;    // Save original settings
         LowObstacleRate = thePlatformGenerator.randomLowObstacleThreshold;  // Save original settings
 
-        powerupActive = true;       // set power up to be true
+        if (safeMode)
+        {
+            lowObstacleList = FindObjectsOfType<PlatformDestroyer>();      // generate a list of all low obstacles and disable
+            for (int i = 0; i < lowObstacleList.Length; i++)
+            {
+                if (lowObstacleList[i].gameObject.name == "Low Obstacle(Clone)")            // look for all objects call Low Obstacle Clone
+                {
+                    lowObstacleList[i].gameObject.SetActive(false);                         // Disable them
+                }
+            }
+        }
+        powerupActive = true;                                               // set power up to be true
 
 
     }

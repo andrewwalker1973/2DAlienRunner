@@ -15,7 +15,8 @@ public class GameManager : MonoBehaviour
 
     private ScoreManager theScoreManager;           // reference the scoremanager script
 
-    public DeathMenu theDeathScreen;
+    public DeathMenu theDeathScreen;                // refernec the death screen
+    public bool powerUpReset;                       // bool to reset the powerup to turn them off on restart
 
     // Start is called before the first frame update
     void Start()
@@ -36,15 +37,7 @@ public class GameManager : MonoBehaviour
         theDeathScreen.gameObject.SetActive(true);          // bring up the death Menu screen
     }
 
-   /* public IEnumerator RestartGameCo()
-    {
-        
-        yield return new WaitForSeconds(1f);                    // wait 1 sec
-        
-
-
-    }
-   */
+  
 
     public void ResetToBegining()               // AW Dont want to reset. want to continue
     {
@@ -60,5 +53,6 @@ public class GameManager : MonoBehaviour
         thePlayer.gameObject.SetActive(true);                       // re-enable the player
         theScoreManager.scoreCount = 0;                             // reset score back to 0
         theScoreManager.scoreIncreasing = true;                     // let score being increasing again
+        powerUpReset = true;                                        // reset powerup duration to 0 to turn them off
     }
 }
