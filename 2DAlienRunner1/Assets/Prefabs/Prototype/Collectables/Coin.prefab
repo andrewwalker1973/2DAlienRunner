@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 6634914569864337733}
   - component: {fileID: 6634914569864337722}
   - component: {fileID: 5794381757341960781}
-  - component: {fileID: -7178708204794261324}
   m_Layer: 0
   m_Name: Coin
   m_TagString: Coin
@@ -127,7 +126,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 861abb862f6f6ad4ba374650bed347e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreToGive: 100
+  scoreToGive: 10
+  coinSoundName: Coin
 --- !u!114 &5794381757341960781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,16 +141,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   platformDestructionPoint: {fileID: 0}
---- !u!114 &-7178708204794261324
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6634914569864337723}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec23fa4ff04097745aa65a5f2fbf3e50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coinSoundName: Coin

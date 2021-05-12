@@ -7,11 +7,14 @@ public class ScoreManager : MonoBehaviour
 {
     public TextMeshProUGUI scoreText;           //TextMesh Pro Text Field for score
     public TextMeshProUGUI hiScoreText;         //TextMesh Pro Text Field for Hiscore
+    public TextMeshProUGUI coinScoreText;         //TextMesh Pro Text Field for Hiscore
 
 
 
     public float scoreCount;                    // What is the score count
-    private float hiScoreCount;                  // what is the hi score
+    public float hiScoreCount;                  // what is the hi score
+    public bool highScoreAchieved = false;
+    private int coinScore;
 
     public float pointsPerSecond;               // how much to increase score by
     public bool scoreIncreasing;                // is score increasing ? dont want to increase while dead
@@ -21,11 +24,13 @@ public class ScoreManager : MonoBehaviour
     
     void Start()
     {
-        if (PlayerPrefs.HasKey("Highscore"))                // if highscore exists in playprefs
+        if (PlayerPrefs.HasKey("HighScore"))                // if highscore exists in playprefs
         {
-            hiScoreCount = PlayerPrefs.GetFloat("HighScore");       // pull from player prefs
-            
+            // pull from player prefs
+            Debug.Log("Found player Pref");
+            hiScoreCount = PlayerPrefs.GetFloat("HighScore", 0); // pull from player prefs and set to 0 if not found
         }
+ 
     }
 
 
@@ -38,15 +43,17 @@ public class ScoreManager : MonoBehaviour
         }
         
 
-        if (scoreCount > hiScoreCount)                      // if score > hghscore update highscore
-        {
-            hiScoreCount = scoreCount;                      // update highscore
-             PlayerPrefs.SetFloat("HighScore", hiScoreCount);            // AW save highscore to playerPrefs may not be the best place for it as this happens while player is running
-            
-        }
+       // if (scoreCount > hiScoreCount)                      // if score > hghscore update highscore
+      //  {
+          //  hiScoreCount = scoreCount;                      // update highscore
+            // PlayerPrefs.SetFloat("HighScore", hiScoreCount);            // AW save highscore to playerPrefs may not be the best place for it as this happens while player is running
+
+
+      //  }
 
         scoreText.text = "Score : " + Mathf.Round (scoreCount);           // set the scorecout on screen rount to solid number
         hiScoreText.text = "HiScore : " + Mathf.Round(hiScoreCount);     // Set the hi score on screen
+        coinScoreText.text = "Coins : " + Mathf.Round(coinScore);           // set the scorecout on screen rount to solid number
 
     }
 
@@ -57,5 +64,24 @@ public class ScoreManager : MonoBehaviour
             pointsToAdd = pointsToAdd * 2;  // double the points
         }
         scoreCount += pointsToAdd;      // otherwise normal add
-     }   
+     }
+
+    public void AddCoins(int coinsToAdd)
+    {
+        
+        coinScore += coinsToAdd;      // Add coins 
+    }
+
+    public void SaveHighScore()
+    {
+        Debug.Log("Save high score000");
+        if (scoreCount > hiScoreCount)                      // if score > hghscore update highscore
+        {
+            Debug.Log("Save high score");
+
+            hiScoreCount = scoreCount;                      // update highscor
+            highScoreAchieved = true;
+            PlayerPrefs.SetFloat("HighScore", hiScoreCount);            // AW save highscore to playerPrefs may not be the best place for it as this happens while player is runnin
+        }
+    }
 }

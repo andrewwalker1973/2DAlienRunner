@@ -8,11 +8,14 @@ public class PlayerController : MonoBehaviour
     //Jump Settings
     [SerializeField] private float jumpForce;               // How much force to apply to jump
     public bool isOnGround;                                 // bool to check if grounded
- 
+    public bool isJumping;                                  // ARe we in the process of jumping
+    [SerializeField] private float movespeed = 9f;         // Start MoveSpeed
+
+
 
 
     // speed Modifier
-    [SerializeField]  private float movespeed = 9f;         // Start MoveSpeed
+
     private float moveSpeedStore;                           // store of start speed to be used when restarting
     private float speedMilestoneCountStore;                 // store of start milestone to be used when restarting
     public float speedMultiplier;                           // how much to multiple spped by yo increase
@@ -20,47 +23,57 @@ public class PlayerController : MonoBehaviour
     public float speedIncreaseMilestone;                    // How much to increase the distance between milestones
     private float speedIncreaseMilestoneStore;              // store of initial milestore to be used when restarting
 
-
-
-    // Bring in other references
-    private Rigidbody playerRb;                             // Player rigibody
-    private BoxCollider playerBoxCollider;                  // Player Box collider
-    
-
-
     //Slide Settings
-    private Vector3 slideColliderSizeRestore = new Vector3(1, 2, 1);            // Collider settings for when sliding
-    private Vector3 slideColliderCenterRestore = new Vector3(0, 0, 0);          // Collider settings for when sliding
     public bool isSliding = false;                                              // am Sliding true/false
 
     public GameManager theGameManager;                              // Reference the GameManager script to call fucntions
 
-  //  public AudioSource deathSound;
-  //  public AudioSource jumpSound;
+    //  public AudioSource deathSound;
+    //  public AudioSource jumpSound;
 
-    
+    // Character Controller properties
+    private CharacterController controller;                 // define the character controller
+    [SerializeField] private float gravity = 20f;                            // define initail gravity
+    private float verticalVelocity;                         // define vertical upward motion
+
+   // private float hiScoreCount;                  // what is the hi score
+
+
+    //Code to give points when picking up coin
+    //   public int coinscoreToGive;     // what point value to give
+     private ScoreManager theScoreManager;       // reference the score manager
+
     void Start()
     {
-       
 
-        // Get Components off Player object
-        playerRb = GetComponent<Rigidbody>();
-        playerBoxCollider = GetComponent<BoxCollider>();
+        controller = GetComponent<CharacterController>();           // reference the character controller
+        theScoreManager = FindObjectOfType<ScoreManager>();         // find score manager script
+                                                                   
         
-
-
 
         // Save settings to reset when restarting game
-        speedMilestoneCount = speedIncreaseMilestone;                   
-        moveSpeedStore = movespeed;
+        speedMilestoneCount = speedIncreaseMilestone;
         speedMilestoneCountStore = speedMilestoneCount;
         speedIncreaseMilestoneStore = speedIncreaseMilestone;
-        
+
+       
+
+
     }
 
-   
+
     void Update()
     {
+
+
+        if (controller.isGrounded) //if grounded
+        {
+            isOnGround = true;             // seton ground to true - am on ground
+            isJumping = false;              // we are not jumping so false
+            //anim.SetBool("Grounded", true);
+
+            verticalVelocity = -0.1f;       // ensure normal vertical velocity
+        }
 
         #region Inputs for Player
         // Code to manage mobile and keyboard inputs
@@ -73,125 +86,115 @@ public class PlayerController : MonoBehaviour
             Debug.Log(" Go Right");
         }
 
-        if (MobileInput.Instance.SwipeUp || Input.GetKeyDown(KeyCode.UpArrow) && isOnGround)
+        if (MobileInput.Instance.SwipeUp || Input.GetKeyDown(KeyCode.UpArrow) && isOnGround)            // if swipe up and on ground then jumpm
         {
-            StartJump();
+            //  anim.SetTrigger("Jump");
+            isOnGround = false;                                                                         // no longer on ground
+            isJumping = true;                                                                           // We are jumping
+            verticalVelocity = jumpForce;                                                               // how high to jump
         }
-        else if (MobileInput.Instance.SwipeDown || Input.GetKeyDown(KeyCode.DownArrow))
+        else if (MobileInput.Instance.SwipeDown || Input.GetKeyDown(KeyCode.DownArrow) && isOnGround)       // if swipe down and we are on ground then slide
         {
-            // AW maybe check to make sure we are on ground, cant slide in the air ?
+            StartSliding();
+
+            // maybe add a cancel invoke here to allow for longer sliding
+        }
+        else if (MobileInput.Instance.SwipeDown || Input.GetKeyDown(KeyCode.DownArrow) && isJumping && !isOnGround)     // if jumping and not on ground then increase down ward motion to fall faster abd then slide
+        {
+            verticalVelocity = -5f;
             StartSliding();
         }
-
+        else
+        {
+            verticalVelocity -= (gravity * Time.deltaTime); // slowly fall to ground level if normal jump
+        }
         #endregion
 
-        // Code to move the player to the right at spped value
-        if (transform.position.x > speedMilestoneCount)                     // if > milestone increase speed
-        {
-            speedMilestoneCount += speedIncreaseMilestone;
-            speedIncreaseMilestone = speedIncreaseMilestone * speedMultiplier;
-            movespeed = movespeed * speedMultiplier;
-        }
+        // Calculate where we should be in the future
+        Vector3 targetPosition = transform.position.x * Vector3.back;
+        // Calcuate move vector
+        Vector3 moveVector = Vector3.zero;
+        moveVector.x = (targetPosition - transform.position).normalized.x * movespeed; // character was shakaing 
 
-        playerRb.velocity = new Vector3(movespeed, playerRb.velocity.y);        // Constanlty move to the right
+        //moveVector.x = (targetPosition - transform.position).x * movespeed;
 
 
-        
+        moveVector.y = verticalVelocity;
+        moveVector.x = movespeed;
+        controller.Move(moveVector * Time.deltaTime);
     }
 
-    private void OnCollisionEnter(Collision collision)
+
+
+
+    #region Slide and Jump functions
+    private void StartSliding()
     {
+        // Code executed when the player slides
 
-        if (collision.gameObject.CompareTag("Ground"))  // if Hit Ground then we are grounded
-        {
-            isOnGround = true;
-        }
-        if (collision.gameObject.CompareTag("Obstacle")) //If hit Obstacle process
-        {
-            Debug.Log("Hit Obstacle");
-          //  deathSound.Play();
-            theGameManager.RestartGame();       // AW want pause and choose to continue later
-        }
-        
-          if (collision.gameObject.CompareTag("Enemy"))  // If hit Enemy
-          {
-              if (isSliding == true)                      // If the Player is sliding, they kick the feet out from under enemy and they die
-              {
-                  Debug.Log("Killed Enemy");
-                  Destroy(collision.gameObject);          // Code to destroy the object that we collided with
-              }
-              else
-              {
-                  Debug.Log("Hit Enemy");
-                //  deathSound.Play();
-                  theGameManager.RestartGame();  // AW want pause and choose to continue later
-                  movespeed = moveSpeedStore;     //Reset back to starting game speed
-                  speedMilestoneCount = speedMilestoneCountStore;  //Reset back to starting game speed increase
-                  speedIncreaseMilestone = speedIncreaseMilestoneStore; //Reset back to starting game spped milestone
-              }
-          }
-      }
+        // anim.SetBool("Sliding", true);
+        isSliding = true;
+        controller.height /= 2;
+        controller.center = new Vector3(controller.center.x, /*controller.center.y / 2*/ -0.5f, controller.center.z);
+        Invoke("StopSliding", 1.0f);
+    }
+    private void StopSliding()
+    {
+        // Code executed when the player stops sliding
+        //  anim.SetBool("Sliding", false);
 
+        controller.height *= 2;
+        controller.center = new Vector3(controller.center.x, 0, controller.center.z);
+        isSliding = false;
+    }
 
-
-      #region Slide and Jump functions
-      private void StartSliding()
-      {
-          // Code executed when the player slides
-
-          // anim.SetBool("Sliding", true);
-          isSliding = true;
-          playerBoxCollider.size -= new Vector3(0 , playerBoxCollider.size.y / 2, 0);     // shrink collider 
-          playerBoxCollider.center -= new Vector3(0, playerBoxCollider.size.y / 2, 0);    // shrink collider 
-          Invoke("StopSliding", 1.0f);
-      }
-      private void StopSliding()
-      {
-          // Code executed when the player stops sliding
-          //  anim.SetBool("Sliding", false);
-          isSliding = false;
-          playerBoxCollider.size = slideColliderSizeRestore;                  // Restore collider
-          playerBoxCollider.center = slideColliderCenterRestore;              // Restore collider
-      }
-
-      private void StartJump()
-      {
-          // Code executed when the player jumps
-          //anim.SetTrigger("Jump");
-          playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);       // Actual jump using physics to jump
-          isOnGround = false;
-         // jumpSound.Play();
-      }
+    private void StartJump()
+    {
+        // Code executed when the player jumps
+        //anim.SetTrigger("Jump");
+        verticalVelocity = jumpForce;
+        isOnGround = false;
+        // jumpSound.Play();
+    }
     #endregion
 
 
-    // code for powerup triggger
-    void OnTriggerEnter(Collider other)
-    {
-        print(other + " name " + other.name);
-        switch (other.tag)
-        {
-            case "Coin":
-               
-                CoinCollision(other);
-                break;
-           // case "Magnet":
-          //      MagnetCollision(other);
-                //       Debug.Log("Magnet collide");
-           //     break;
 
-           // default:
-            //    CheckUnTaggedCollision(other);
-              //  break;
+
+    private void OnTriggerEnter(Collider other)
+    {
+       // Debug.Log("enter");
+        if (other.gameObject.CompareTag("Obstacle"))
+        {
+            Debug.Log("Hit obstalce");
+            theScoreManager.SaveHighScore();
+            theGameManager.RestartGame();       // AW want pause and choose to continue later
         }
+        if (other.gameObject.CompareTag("Enemy"))  // If hit Enemy
+        {
+            if (isSliding == true)                      // If the Player is sliding, they kick the feet out from under enemy and they die
+            {
+                
+                Destroy(other.gameObject);          // Code to destroy the object that we collided with
+            }
+            else
+            {
+                theScoreManager.SaveHighScore();
+                //  deathSound.Play();
+                theGameManager.RestartGame();  // AW want pause and choose to continue later
+                movespeed = moveSpeedStore;     //Reset back to starting game speed
+                speedMilestoneCount = speedMilestoneCountStore;  //Reset back to starting game speed increase
+                speedIncreaseMilestone = speedIncreaseMilestoneStore; //Reset back to starting game spped milestone
+            }
+        }
+   
+
+        
     }
 
+   
 
-     private void CoinCollision(Collider other)
-      {
-        CoinCollect coin = other.GetComponent<CoinCollect>();
-        coin.Collect();
 
-      }
-    
+
 }
+

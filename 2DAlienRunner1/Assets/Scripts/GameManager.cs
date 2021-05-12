@@ -16,32 +16,50 @@ public class GameManager : MonoBehaviour
     private ScoreManager theScoreManager;           // reference the scoremanager script
 
     public DeathMenu theDeathScreen;                // refernec the death screen
+    public HiScoreMenu theHiScoreMenu;
     public bool powerUpReset;                       // bool to reset the powerup to turn them off on restart
 
-    // Start is called before the first frame update
+ 
+
+   
+
+
     void Start()
     {
 
         platformStartPoint = platformGenerator.position;            // set the platform startpoint
         playerStartPoint = thePlayer.transform.position;             // set the player start point
         theScoreManager = FindObjectOfType<ScoreManager>();         // find the score Manager script
+
     }
 
     
 
     public void RestartGame()           // function to be called from other scripts to restart the game
     {
-        // StartCoroutine("RestartGameCo");
         theScoreManager.scoreIncreasing = false;         // stop increasing score
         thePlayer.gameObject.SetActive(false);              // disable the player
-        theDeathScreen.gameObject.SetActive(true);          // bring up the death Menu screen
-    }
+        if (theScoreManager.highScoreAchieved == true)
+        {
+            theHiScoreMenu.gameObject.SetActive(true);
+        }
+        else
+        {
+            theDeathScreen.gameObject.SetActive(true);          // bring up the death Menu screen
+        }
+
+
+
+}
 
   
 
     public void ResetToBegining()               // AW Dont want to reset. want to continue
     {
         theDeathScreen.gameObject.SetActive(false);          // stop up the death Menu screen
+        theHiScoreMenu.gameObject.SetActive(false);
+        theScoreManager.highScoreAchieved = false;
+
         platformList = FindObjectsOfType<PlatformDestroyer>();      // generate a list of all active platfomrs and disable
         for (int i = 0; i < platformList.Length; i++)
         {
@@ -54,5 +72,7 @@ public class GameManager : MonoBehaviour
         theScoreManager.scoreCount = 0;                             // reset score back to 0
         theScoreManager.scoreIncreasing = true;                     // let score being increasing again
         powerUpReset = true;                                        // reset powerup duration to 0 to turn them off
+
+        
     }
 }
